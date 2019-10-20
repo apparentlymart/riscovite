@@ -2,7 +2,7 @@
 BASENAME=cpu
 DEVICE=up5k
 PACKAGE=sg48
-VERILOG_SRC=registers.v
+VERILOG_SRC=alu.v registers.v
 PIN_DEF=cpuboard.pcf
 
 all: $(BASENAME).rpt $(BASENAME).bin

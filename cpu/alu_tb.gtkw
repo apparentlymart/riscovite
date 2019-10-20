@@ -1,0 +1,27 @@
+[*]
+[*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
+[*] Sun Oct 20 01:14:29 2019
+[*]
+[dumpfile] "alu_tb.vcd"
+[dumpfile_mtime] "Sun Oct 20 01:12:00 2019"
+[dumpfile_size] 1696
+[savefile] "alu_tb.gtkw"
+[timestart] 0
+[size] 2400 1424
+[pos] -1 -1
+*-2.011588 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 341
+[signals_width] 200
+[sst_expanded] 1
+[sst_vpaned_height] 411
+@28
+alu_tb.clk
+alu_tb.op[3:0]
+@821
+alu_tb.op_str[31:0]
+@24
+alu_tb.rs1[31:0]
+alu_tb.rs2[31:0]
+alu_tb.rd[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
