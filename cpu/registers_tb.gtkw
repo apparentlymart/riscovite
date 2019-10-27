@@ -1,19 +1,20 @@
 [*]
 [*] GTKWave Analyzer v3.3.79 (w)1999-2017 BSI
-[*] Sat Oct 19 23:39:03 2019
+[*] Sun Oct 27 21:41:31 2019
 [*]
 [dumpfile] "registers_tb.vcd"
-[dumpfile_mtime] "Sat Oct 19 23:38:01 2019"
-[dumpfile_size] 866
+[dumpfile_mtime] "Sat Oct 19 23:45:12 2019"
+[dumpfile_size] 1751
 [savefile] "registers_tb.gtkw"
-[timestart] 0
+[timestart] 19
 [size] 2400 1424
 [pos] -1 -1
-*-0.122910 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-0.122910 20 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] registers_tb.
 [sst_width] 410
-[signals_width] 198
+[signals_width] 332
 [sst_expanded] 1
-[sst_vpaned_height] 426
+[sst_vpaned_height] 412
 @28
 registers_tb.clk
 registers_tb.rst
