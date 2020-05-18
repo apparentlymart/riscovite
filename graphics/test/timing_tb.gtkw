@@ -1,0 +1,39 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Mon May 18 01:56:26 2020
+[*]
+[dumpfile] "build/timing_tb.vcd"
+[dumpfile_mtime] "Mon May 18 01:52:20 2020"
+[dumpfile_size] 152776047
+[savefile] "test/timing_tb.gtkw"
+[timestart] 0
+[size] 1680 962
+[pos] -122 -105
+*-4.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] timing_tb.
+[sst_width] 223
+[signals_width] 179
+[sst_expanded] 1
+[sst_vpaned_height] 279
+@28
+timing_tb.dut.reset
+timing_tb.dut.clk
+@200
+-Outputs
+@24
+timing_tb.dut.x[15:0]
+timing_tb.dut.y[15:0]
+@28
+timing_tb.dut.visible
+timing_tb.dut.hsync
+timing_tb.dut.vsync
+@200
+-Internals
+@24
+timing_tb.dut.count_h[15:0]
+timing_tb.dut.state_h[1:0]
+timing_tb.dut.count_v[15:0]
+@25
+timing_tb.dut.state_v[1:0]
+[pattern_trace] 1
+[pattern_trace] 0

@@ -1,0 +1,106 @@
+# This is a physical constraints file for the graphics core running on a
+# BeagleWire board, with the BeagleWire's on-board 32MB SDRAM as the video
+# RAM, the DVI encoder chip connected to the lower PMOD (UPSIDE DOWN, because
+# BeagleWire's PMODs are oriented incorrectly), and with signals connected
+# to the BeagleBone Black's GPMC (external memory controller) as the system
+# bus interface.
+#
+# This mode is useful for running the graphics core in isolation during
+# development, but due to the BeagleBone Black GPMC interface it requires a
+# different "top" module (top-beaglewire-dev.v) to wrap the normal "top" and
+# translate from the GPMC signalling to the system # bus that the graphics core
+# expects.
+
+# Reset: USR0 button on the BeagleWire board
+set_io reset 25
+
+# Main clock: 100MHz clock on the BeagleWire board
+set_io clk_100M 61
+
+# Display Outputs: TFP410 or SiI164 DVI encoder connected to the lower PMOD
+# (Pinout for Black Mesa Labs breakout board)
+set_io disp_clk   8   # PMOD4-A2
+set_io disp_hsync 11  # PMOD4-A4
+set_io disp_vsync 12  # PMOD4-B4
+set_io disp_de    15  # PMOD4-B3
+set_io disp_b[3]  4   # PMOD4-A1
+set_io disp_b[2]  7   # PMOD4-B1
+set_io disp_b[1]  9   # PMOD4-B2
+set_io disp_b[0]  10  # PMOD4-A3
+set_io disp_g[3]  115 # PMOD3-A3
+set_io disp_g[2]  114 # PMOD3-B3
+set_io disp_g[1]  130 # PMOD3-A4
+set_io disp_g[0]  129 # PMOD3-B4
+set_io disp_r[3]  110 # PMOD3-A1
+set_io disp_r[2]  107 # PMOD3-B1
+set_io disp_r[1]  113 # PMOD3-A2
+set_io disp_r[0]  112 # PMOD3-B2
+
+# Vertical Blank Interrupt Signal: pulses active at the beginning of the
+# vertical blanking period of each frame to indicate that video RAM is
+# becoming writable and the host can prepare the next frame.
+set_io int_vblank 63
+
+# Video RAM: 32MB SDRAM on the BeagleWire board
+set_io vram_addr[0] 118
+set_io vram_addr[1] 117
+set_io vram_addr[2] 116
+set_io vram_addr[3] 101
+set_io vram_addr[4] 81
+set_io vram_addr[5] 83
+set_io vram_addr[6] 90
+set_io vram_addr[7] 91
+set_io vram_addr[8] 82
+set_io vram_addr[9] 84
+set_io vram_addr[10] 119
+set_io vram_addr[11] 85
+set_io vram_addr[12] 87
+set_io vram_data[0] 96
+set_io vram_data[1] 97
+set_io vram_data[2] 98
+set_io vram_data[3] 99
+set_io vram_data[4] 95
+set_io vram_data[5] 80
+set_io vram_data[6] 79
+set_io vram_data[7] 78
+set_io vram_bank[0] 121
+set_io vram_bank[1] 120
+set_io vram_clk 93
+set_io vram_cke 88
+set_io vram_we 128
+set_io vram_cs 122
+set_io vram_dqm 94
+set_io vram_ras 124
+set_io vram_cas 125
+
+# Beaglebone Black GPMC: wrapped around the system memory bus the core expects,
+# so that software in the Beaglebone Black ARM core can write to video memory
+# and registers.
+set_io gpmc_ad[0] 134
+set_io gpmc_ad[1] 136
+set_io gpmc_ad[2] 21
+set_io gpmc_ad[3] 22
+set_io gpmc_ad[4] 135
+set_io gpmc_ad[5] 138
+set_io gpmc_ad[6] 23
+set_io gpmc_ad[7] 24
+set_io gpmc_ad[8] 139
+set_io gpmc_ad[9] 2
+set_io gpmc_ad[10] 1
+set_io gpmc_ad[11] 141
+set_io gpmc_ad[12] 16
+set_io gpmc_ad[13] 3
+set_io gpmc_ad[14] 144
+set_io gpmc_ad[15] 143
+set_io gpmc_advn 19
+set_io gpmc_csn1 137 
+set_io gpmc_clk 142
+set_io gpmc_wein 18
+set_io gpmc_oen 20
+
+# LEDs: These are not part of the normal functionality but we hook them up
+# for temporary use in debugging.
+set_io led[0] 28
+set_io led[1] 29
+set_io led[2] 31
+set_io led[3] 32

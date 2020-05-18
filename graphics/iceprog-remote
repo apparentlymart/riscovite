@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# This is a helper script that can be used instead of iceprog directly when
+# the FPGA development board is connected to a remote system, rather than
+# locally on the system used for development.
+#
+# To use it, first set the ICEPROG_REMOTE_HOST environment variable to the
+# host where iceprog will run (which must be SSH-able) and then use the
+# Makefile in this directory with ICEPROG overridden, like this:
+#   make ICEPROG=./iceprog-remote program
+#
+# For example, if you are using a Beaglebone Block via its USB network gadget
+# interface, you might set:
+#     export ICEPROG_REMOTE_HOST=192.168.6.2
+
+set -euo pipefail
+
+if [ -z "${ICEPROG_REMOTE_HOST:-}" ]; then
+    echo >&2 ICEPROG_REMOTE_HOST environment variable must be set to use iceprog-remote
+    exit 1
+fi
+
+if [ -z "${ICEPROG_REMOTE_ICEPROG:-}" ]; then
+    ICEPROG_REMOTE_ICEPROG=iceprog
+fi
+
+FILENAME="$1"
+
+ssh "${ICEPROG_REMOTE_HOST}" ${ICEPROG_REMOTE_ICEPROG} - <${FILENAME}
