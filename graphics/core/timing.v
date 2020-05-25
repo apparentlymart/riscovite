@@ -6,6 +6,8 @@ module timing(
     output reg [15:0] y,
     output reg hsync,
     output reg vsync,
+    output reg hprep, // negative x is counting up to display position zero
+    output reg vprep, // negative y is counting up to display position zero
     output reg visible
 );
 
@@ -33,33 +35,33 @@ module timing(
     reg [1:0] state_v = `VIDEO_FRONTPORCH;
     reg [15:0] count_v = 1; // 1-based so we will stop when count_v is the total lines for the current state
 
-    // Our outputs are combinational logic based on the state and count
-    // registers that we'll manipulate in the state machines below.
-    always @* begin
-        if (reset == 1'b1) begin
-            hsync   = ~`VIDEO_H_SYNC_ACTIVE;
-            vsync   = ~`VIDEO_V_SYNC_ACTIVE;
-            visible = 1'b0;
-            x       = 16'd0;
-            y       = 16'd0;
-        end else begin
-            hsync   = (state_h == `VIDEO_SYNC) ^ (~`VIDEO_H_SYNC_ACTIVE);
-            vsync   = (state_v == `VIDEO_SYNC) ^ (~`VIDEO_V_SYNC_ACTIVE);
-            visible = (state_h == `VIDEO_ACTIVE) && (state_v == `VIDEO_ACTIVE);
-            x       = count_h - 1;
-            y       = count_v - 1;
-         end
+    // Output updates. Our outputs actually update one clock behind the main
+    // state machine, because our timing is too tight to reliably do everything
+    // inside a single clock period.
+    always @(posedge clk) begin
+        hsync   <= (state_h == `VIDEO_SYNC) ^ (~`VIDEO_H_SYNC_ACTIVE);
+        vsync   <= (state_v == `VIDEO_SYNC) ^ (~`VIDEO_V_SYNC_ACTIVE);
+        hprep   <= (state_h == `VIDEO_BACKPORCH && state_v == `VIDEO_ACTIVE);
+        vprep   <= state_v == `VIDEO_BACKPORCH;
+        visible <= (state_h == `VIDEO_ACTIVE) && (state_v == `VIDEO_ACTIVE);
+        x       <= count_h - 1;
+        y       <= count_v - 1;
     end
 
     // Main state machine. This is responsible for keeping track of our virtual
     // "beam position" and transitioning between the different states that will
-    // inform how we set our external control signals.
+    // inform how we set our external control
     always @(posedge clk) begin
         if (reset == 1'b1) begin
+            // We'll start with a very short one-line vsync and a full hsync,
+            // just because we need to start somewhere and this approach is
+            // easier to look at in simulation. Maybe we'll adjust this
+            // starting condition later if we find that a particular approach
+            // allows real displays to lock faster.
             count_h <= ~16'b0;
-            count_v <= ~16'b0;
-            state_h <= `VIDEO_FRONTPORCH;
-            state_v <= `VIDEO_FRONTPORCH;
+            count_v <= `VIDEO_V_SYNC_LINES-1;
+            state_h <= `VIDEO_SYNC;
+            state_v <= `VIDEO_SYNC;
         end else begin
             inc_v <= 0;
             count_h <= count_h + 16'd1;
@@ -68,11 +70,18 @@ module timing(
                 `VIDEO_SYNC: begin
                     if (count_h == `VIDEO_H_SYNC_PIXELS) begin
                         state_h <= `VIDEO_BACKPORCH;
+                        // For this case in particular we count from a negative
+                        // number of pixels up to zero, so that other modules
+                        // that consume this output can start the display data
+                        // pipeline some number of pixel clocks before the
+                        // display actually begins.
                         count_h <= -`VIDEO_H_BP_PIXELS;
                     end
                 end
                 `VIDEO_BACKPORCH: begin
-                    if (count_h == `VIDEO_H_BP_PIXELS) begin
+                    // As noted in the VIDEO_SYNC case above, our back porch
+                    // phase counts up from a negative number to zero.
+                    if (count_h == 0) begin
                         state_h <= `VIDEO_ACTIVE;
                         count_h <= 16'b1;
                     end
@@ -92,11 +101,15 @@ module timing(
                             `VIDEO_SYNC: begin
                                 if (count_v == `VIDEO_V_SYNC_LINES) begin
                                     state_v <= `VIDEO_BACKPORCH;
-                                    count_v <= 16'b1;
+                                    // Counting from negative up to zero, as
+                                    // with the horizontal back porch.
+                                    count_v <= -`VIDEO_V_BP_LINES;
                                 end
                             end
                             `VIDEO_BACKPORCH: begin
-                                if (count_v == `VIDEO_V_BP_LINES) begin
+                                // Counting from negative up to zero, as
+                                // with the horizontal back porch.
+                                if (count_v == 0) begin
                                     state_v <= `VIDEO_ACTIVE;
                                     count_v <= 16'b1;
                                 end
