@@ -1,0 +1,5 @@
+{
+    "verilog.linting.linter": "iverilog",
+    "verilog.linting.iverilog.arguments": "${workspaceDir}/graphics/core/main.v ${workspaceDir}/graphics/core/testpattern.v ${workspaceDir}/graphics/core/timing.v",
+    "verilog.linting.iverilog.runAtFileLocation": true
+}
