@@ -60,7 +60,7 @@ module top(
         .DELAY_ADJUSTMENT_MODE_RELATIVE("FIXED"),
         .FDA_RELATIVE(4'b0000),
         .SHIFTREG_DIV_MODE(2'b00),
-        //.PLLOUT_SELECT("GENCLK"),
+        .PLLOUT_SELECT("GENCLK"),
         .ENABLE_ICEGATE(1'b0)
     ) pixel_clock (
         .REFERENCECLK(clk_100M),

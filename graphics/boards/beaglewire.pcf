@@ -19,22 +19,22 @@ set_io clk_100M 61
 
 # Display Outputs: TFP410 or SiI164 DVI encoder connected to the lower PMOD
 # (Pinout for Black Mesa Labs breakout board)
-set_io disp_clk   8   # PMOD4-A2
-set_io disp_hsync 11  # PMOD4-A4
-set_io disp_vsync 12  # PMOD4-B4
-set_io disp_de    15  # PMOD4-B3
-set_io disp_b[3]  4   # PMOD4-A1
-set_io disp_b[2]  7   # PMOD4-B1
-set_io disp_b[1]  9   # PMOD4-B2
-set_io disp_b[0]  10  # PMOD4-A3
-set_io disp_g[3]  115 # PMOD3-A3
-set_io disp_g[2]  114 # PMOD3-B3
-set_io disp_g[1]  130 # PMOD3-A4
-set_io disp_g[0]  129 # PMOD3-B4
-set_io disp_r[3]  110 # PMOD3-A1
-set_io disp_r[2]  107 # PMOD3-B1
-set_io disp_r[1]  113 # PMOD3-A2
-set_io disp_r[0]  112 # PMOD3-B2
+set_io disp_clk   9   # PMOD4-B2
+set_io disp_hsync 12  # PMOD4-B4
+set_io disp_vsync 11  # PMOD4-A4
+set_io disp_de    10  # PMOD4-A3
+set_io disp_b[3]  7   # PMOD4-B1
+set_io disp_b[2]  4   # PMOD4-A1
+set_io disp_b[1]  8   # PMOD4-A2
+set_io disp_b[0]  15  # PMOD4-B3
+set_io disp_g[3]  114 # PMOD3-B3
+set_io disp_g[2]  115 # PMOD3-A3
+set_io disp_g[1]  129 # PMOD3-B4
+set_io disp_g[0]  130 # PMOD3-A4
+set_io disp_r[3]  107 # PMOD3-B1
+set_io disp_r[2]  110 # PMOD3-A1
+set_io disp_r[1]  112 # PMOD3-B2
+set_io disp_r[0]  113 # PMOD3-A2
 
 # Vertical Blank Interrupt Signal: pulses active at the beginning of the
 # vertical blanking period of each frame to indicate that video RAM is
