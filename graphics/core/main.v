@@ -19,7 +19,7 @@ module main(
     // period.
     input  host_vram_cs,          // host selects VRAM for write
     input  [13:1] host_vram_addr, // write target address from the host
-    inout  [15:0] host_vram_data, // data to write from the host
+    input  [15:0] host_vram_data, // data to write from the host
     output host_vram_done,        // write operation has completed
     input  host_reg_cs,           // host selects registers for write
     input  [13:1] host_reg_addr,  // write target address from the host

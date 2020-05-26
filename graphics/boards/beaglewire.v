@@ -71,6 +71,31 @@ module top(
         .LATCHINPUTVALUE()
     );
 
+    wire host_vram_cs;
+    wire host_reg_cs;
+    wire [13:1] host_addr;
+    wire [15:0] host_data;
+    wire host_done;
+    wire host_write_avail;
+
+    am335x_gpmc gpmc(
+        .reset(reset),
+        .clk(clk_100M),
+        .pixel_clk(pixel_clk),
+        .gpmc_ad(gpmc_ad),
+        .gpmc_advn(gpmc_advn),
+        .gpmc_csn1(gpmc_csn1),
+        .gpmc_wein(gpmc_wein),
+        .gpmc_oen(gpmc_oen),
+        .gpmc_clk(gpmc_clk),
+        .gfx_vram_cs(host_vram_cs),
+        .gfx_reg_cs(host_reg_cs),
+        .gfx_addr(host_addr),
+        .gfx_data(host_data),
+        .gfx_done(host_done),
+        .gfx_write_avail(host_write_avail)
+    );
+
     main main(
         .pixel_clk(pixel_clk),
         .reset(reset),
@@ -81,7 +106,17 @@ module top(
         .disp_de(disp_de),
         .disp_b(disp_b),
         .disp_g(disp_g),
-        .disp_r(disp_r)
+        .disp_r(disp_r),
+
+        .host_vram_cs(host_vram_cs),
+        .host_vram_addr(host_addr),
+        .host_vram_data(host_data),
+        .host_vram_done(host_done),
+        .host_reg_cs(host_reg_cs),
+        .host_reg_addr(host_addr),
+        .host_reg_data(host_data),
+        .host_reg_done(host_done),
+        .host_write_avail(host_write_avail)
     );
 
 endmodule
