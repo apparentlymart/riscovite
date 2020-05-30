@@ -11,8 +11,6 @@
 // registers on high addresses).
 module am335x_gpmc(
     input reset,
-    input clk,       // system clock (always at least as fast as pixel_clk, but separate clock domain)
-    input pixel_clk, // pixel clock  (approx. 74.250 MHz)
 
     // GPMC signals: these are connected to the relevant pins of the
     // AM335x package where the GPMC peripheral is active.
@@ -23,17 +21,22 @@ module am335x_gpmc(
     input gpmc_oen,       // Output enable (active low)
     input gpmc_clk,       // GPMC peripheral external clock
 
-    // Graphics core signals: these should be connected to the corresponding
-    // host_... signals on the main module. Everything except the two chip
-    // select signals (..._cs) should be connected to both host_vram... and
-    // host_reg_... corresponding signals, and then the chip selects will be
-    // set as needed to distinguish the two.
-    output gfx_vram_cs,
-    output gfx_reg_cs,
-    output [13:1] gfx_addr, // write target address from the host
-    output [15:0] gfx_data, // data to write from the host
-    input  gfx_done,        // write operation has completed (signalled by main module)
-    input  gfx_write_avail  // updated synchronously with pixel_clk to indicate whether a write can succeed without stalling
+    // Queue signals: incoming GPMC requests are queued so that they can be
+    // processed either in the video RAM clock domain (for video RAM writes)
+    // or in the pixel clock domain (for register writes) while freeing up
+    // the GPMC bus for further writes (at least, until the queues fill).
+    //
+    // These signals all belong to the gpmc_clk domain; the calling module
+    // is responsible for configuring the target queue to transfer into the
+    // appropriate target clock domain.
+    output reg [15:0] vram_write_addr,
+    output reg [15:0] vram_write_data,
+    output reg        vram_write,
+    input             vram_can_write,
+    output reg [15:0] reg_write_addr,
+    output reg [15:0] reg_write_data,
+    output reg        reg_write,
+    input             reg_can_write
 );
 
     // We'll manage the bidirectional gpmc_ad signals safely using a SB_IO
@@ -65,61 +68,24 @@ module am335x_gpmc(
         end
     end
 
-    // The "gfx_" signals are in the pixel_clk clock domain, so we need some
-    // extra steps here to ensure that we don't cause metastability. We're
-    // propagating the values through a two-level staging register, which should
-    // be sufficient as long as the GPMC timing is set slow enough for the
-    // main module (using pixel_clk) to keep up.
-    reg [1:0] cs_cross;
-    reg [1:0] we_cross;
-    reg [1:0] oe_cross;
-    reg [31:0] write_data_cross;
-    reg [15:0] addr_cross;
-    reg vram_cs;
-    reg reg_cs;
-    reg we;
-    reg oe;
-    reg [15:0] addr;
-    reg [15:0] write_data;
     always @(negedge gpmc_clk) begin
-        cs_cross[1] <= gpmc_csn1;
-        we_cross[1] <= gpmc_wein;
-        oe_cross[1] <= gpmc_oen;
-        write_data_cross[31:16] <= gpmc_data_in;
+        // If gpmc_advn is unasserted (high) then gpmc_data_in is data to
+        // be written. (assuming this is a write -- we only actually support
+        // writes, so reads are entirely ignored.)
+        // TODO: We're just assuming everything is a video RAM write for now.
+        // Ultimately we'll need to decode part of the address space as
+        // registers, but we don't need that for initial prototyping and when
+        // we do it it'll steal away from our already-teeny 16-bit VRAM address
+        // space that this interface provides. :(
+        if (!gpmc_csn1 && gpmc_advn && !gpmc_wein && !gpmc_oen) begin
+            vram_write_addr <= gpmc_addr;
+            vram_write_data <= gpmc_data_in;
+            vram_write <= 1;
+        end else begin
+            vram_write_addr <= 0;
+            vram_write_data <= 0;
+            vram_write <= 0;
+        end
     end
-    always @ (posedge pixel_clk) begin
-        // Stage 1: copy from the gpmc_clk halves of the staging registers
-        // into the pixel_clk halves.
-        cs_cross[0] <= cs_cross[1];
-        we_cross[0] <= we_cross[1];
-        oe_cross[0] <= os_cross[1];
-        write_data_cross[15:0] <= write_data_cross[31:16];
-        addr_cross <= gpmc_addr;
-
-        // Stage 2: copy from the pixel_clk halves of the staging registers
-        // into the final output registers.
-        // FIXME: Our vram_cs and reg_cs expressions just ignore writes when
-        // gfx_write_avail isn't asserted, which ensures that we won't lock up
-        // when a write is delayed but it also means that we'll just drop
-        // incorrectly-timed writes altogether. Ideally we'd wait until the
-        // main module is ready to receive them, but that would require
-        // maintaining a queue.
-        vram_cs <= cs_cross[0] & we_cross[0] & ~addr_cross[15] & gfx_write_avail; // high-order bit selects registers
-        reg_cs <= cs_cross[0] & we_cross[0] & addr_cross[15] & gfx_write_avail;   // ...and we only support writes, so we ignore reads
-        we <= we_cross[0];
-        oe <= oe_cross[0];
-        write_data <= write_data_cross[15:0];
-        addr <= addr_cross;
-    end
-
-    // The final output registers are then connected to the relevant gfx_...
-    // signals to interact with the main module.
-    assign gfx_vram_cs = vram_cs;
-    assign gfx_reg_cs = reg_cs;
-    assign gfx_addr = addr;
-    assign gfx_data = data;
-    // We ignore gfx_done because we're using the gpmc in async mode and so
-    // it'll just assume the operation succeeded after the appropriate number
-    // of gpmc_clk cycles.
 
 endmodule

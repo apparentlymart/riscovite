@@ -41,6 +41,9 @@ module top(
     reg [31:0] count = 0;
     assign led = { 0, 0, disp_de };
 
+    // Our video RAM (SDRAM) clock is just our 100MHz input clock, unmodified.
+    assign vram_clk = clk_100M;
+
     // PLL to generate our pixel clock from the 100MHz clk_100M input clock
     // icepll -i 100 -o 74.25
     //   Given input frequency:       100.000 MHz
@@ -78,22 +81,36 @@ module top(
     wire host_done;
     wire host_write_avail;
 
+    wire [15:0] gpmc_vram_write_addr;
+    wire [15:0] gpmc_vram_write_data;
+    wire gpmc_vram_write;
+    wire gpmc_vram_can_write;
     am335x_gpmc gpmc(
         .reset(reset),
-        .clk(clk_100M),
-        .pixel_clk(pixel_clk),
         .gpmc_ad(gpmc_ad),
         .gpmc_advn(gpmc_advn),
         .gpmc_csn1(gpmc_csn1),
         .gpmc_wein(gpmc_wein),
         .gpmc_oen(gpmc_oen),
         .gpmc_clk(gpmc_clk),
-        .gfx_vram_cs(host_vram_cs),
-        .gfx_reg_cs(host_reg_cs),
-        .gfx_addr(host_addr),
-        .gfx_data(host_data),
-        .gfx_done(host_done),
-        .gfx_write_avail(host_write_avail)
+        .vram_write_addr(gpmc_vram_write_addr),
+        .vram_write_data(gpmc_vram_write_data),
+        .vram_write(gpmc_vram_write),
+        .vram_can_write(gpmc_vram_can_write)
+    );
+
+    // gpmc_vram_queue is an async FIFO used to bring video RAM writes from
+    // the gpmc clock domain into the SDRAM domain so that the SDRAM controller
+    // can process them next time the SDRAM bus is available.
+    asyncfifo #(.BUFFER_ADDR_WIDTH(4), .DATA_WIDTH(32)) gpmc_vram_queue (
+        .reset(reset),
+        .write_clk(gpmc_clk),
+        .write(gpmc_vram_write),
+        .write_data({gpmc_vram_write_addr, gpmc_vram_write_data}),
+        .can_write(gpmc_vram_can_write),
+
+        .read_clk(vram_clk),
+        // TODO: hook up the rest, once we have something consuming the output.
     );
 
     main main(
