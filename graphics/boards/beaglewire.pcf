@@ -73,9 +73,7 @@ set_io vram_dqm 94
 set_io vram_ras 124
 set_io vram_cas 125
 
-# Beaglebone Black GPMC: wrapped around the system memory bus the core expects,
-# so that software in the Beaglebone Black ARM core can write to video memory
-# and registers.
+# Beaglebone Black GPMC (not currently used)
 set_io gpmc_ad[0] 134
 set_io gpmc_ad[1] 136
 set_io gpmc_ad[2] 21
@@ -97,6 +95,13 @@ set_io gpmc_csn1 137
 set_io gpmc_clk 142
 set_io gpmc_wein 18
 set_io gpmc_oen 20
+
+# SPI: This is the same set of pins used to upload the configuration bitstream
+# from the BeagleBone Black. (Not currently used.)
+set_io spi_miso 67
+set_io spi_mosi 68
+set_io spi_clk 70
+set_io spi_cs 71
 
 # LEDs: These are not part of the normal functionality but we hook them up
 # for temporary use in debugging.
