@@ -14,6 +14,7 @@ VVP=vvp
 # Derived settings
 PCF=boards/$(BOARD).pcf
 TOP_V=boards/$(BOARD).v
+NEXTPNR_PREPACK_PY=boards/$(BOARD).nextpnr-prepack.py
 CORE_V=$(shell find core -name "*.v")
 TESTBENCH_V=$(shell find test -name "*_tb.v")
 BIN_FILE=build/$(BOARD).bin
@@ -43,8 +44,8 @@ $(SCHEMATIC_FILE): $(CORE_V)
 $(SCHEMATIC_IMAGE_FILE): $(SCHEMATIC_FILE)
 	dot -Tpng -o$@ $<
 
-$(ASC_FILE): $(PCF) $(JSON_FILE)
-	$(NEXTPNR) --$(DEVICE) $(if $(PACKAGE),--package $(PACKAGE)) $(if $(FREQ),--freq $(FREQ)) --json $(JSON_FILE) --pcf $(PCF) --asc $@
+$(ASC_FILE): $(PCF) $(JSON_FILE) $(NEXTPNR_PREPACK_PY)
+	$(NEXTPNR) --$(DEVICE) $(if $(PACKAGE),--package $(PACKAGE)) $(if $(FREQ),--freq $(FREQ)) --pre-pack=$(NEXTPNR_PREPACK_PY) --json $(JSON_FILE) --pcf $(PCF) --asc $@
 
 $(BIN_FILE): $(ASC_FILE)
 	$(ICEPACK) $< $@
