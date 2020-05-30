@@ -17,7 +17,7 @@ module crossdomain #(parameter SIZE = 1) (
 
     reg [SIZE-1:0] data_tmp;
 
-    always @(posedge wclk) begin
+    always @(posedge clk) begin
         if (reset) begin
             {data_out, data_tmp} <= 0;
         end else begin

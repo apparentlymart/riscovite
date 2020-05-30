@@ -1,0 +1,65 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Sat May 30 18:20:09 2020
+[*]
+[dumpfile] "build/asyncfifo_tb.vcd"
+[dumpfile_mtime] "Sat May 30 18:18:52 2020"
+[dumpfile_size] 3718
+[savefile] "test/asyncfifo_tb.gtkw"
+[timestart] 0
+[size] 1680 962
+[pos] -1 -1
+*-3.003270 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] asyncfifo_tb.
+[treeopen] asyncfifo_tb.dut.
+[sst_width] 223
+[signals_width] 278
+[sst_expanded] 1
+[sst_vpaned_height] 279
+@28
+asyncfifo_tb.reset
+@200
+-
+-Write Domain
+@29
+asyncfifo_tb.write_clk
+@28
+asyncfifo_tb.write
+@22
+asyncfifo_tb.write_data[15:0]
+@28
+asyncfifo_tb.can_write
+@22
+asyncfifo_tb.dut.write_addr[1:0]
+@28
+asyncfifo_tb.dut.write_ptr[2:0]
+asyncfifo_tb.dut.write_ptr_grey_w[2:0]
+asyncfifo_tb.dut.read_ptr_grey_w[2:0]
+@200
+-Read Domain
+@28
+asyncfifo_tb.read_clk
+asyncfifo_tb.read
+asyncfifo_tb.can_read
+@22
+asyncfifo_tb.read_data[15:0]
+asyncfifo_tb.dut.read_addr[1:0]
+@28
+asyncfifo_tb.dut.read_ptr[2:0]
+asyncfifo_tb.dut.write_ptr_grey_r[2:0]
+asyncfifo_tb.dut.read_ptr_grey_r[2:0]
+@200
+-
+-Write->Read
+@28
+asyncfifo_tb.dut.write_ptr_grey_sync.data_in[2:0]
+asyncfifo_tb.dut.write_ptr_grey_sync.data_tmp[2:0]
+asyncfifo_tb.dut.write_ptr_grey_sync.data_out[2:0]
+@200
+-Read->Write
+@28
+asyncfifo_tb.dut.read_ptr_grey_sync.data_in[2:0]
+asyncfifo_tb.dut.read_ptr_grey_sync.data_tmp[2:0]
+asyncfifo_tb.dut.read_ptr_grey_sync.data_out[2:0]
+[pattern_trace] 1
+[pattern_trace] 0
