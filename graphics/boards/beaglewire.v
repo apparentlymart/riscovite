@@ -74,48 +74,25 @@ module top(
         .LATCHINPUTVALUE()
     );
 
-    wire host_vram_cs;
-    wire host_reg_cs;
-    wire [13:1] host_addr;
-    wire [15:0] host_data;
-    wire host_done;
-    wire host_write_avail;
-
-    wire [15:0] gpmc_vram_write_addr;
-    wire [15:0] gpmc_vram_write_data;
-    wire gpmc_vram_write;
-    wire gpmc_vram_can_write;
-    am335x_gpmc gpmc(
+    wire data_can_write;
+    wire [11:0] pixel_data;
+    wire pixel_data_ready;
+    testpattern pattern(
+        .clk(vram_clk),
         .reset(reset),
-        .gpmc_ad(gpmc_ad),
-        .gpmc_advn(gpmc_advn),
-        .gpmc_csn1(gpmc_csn1),
-        .gpmc_wein(gpmc_wein),
-        .gpmc_oen(gpmc_oen),
-        .gpmc_clk(gpmc_clk),
-        .vram_write_addr(gpmc_vram_write_addr),
-        .vram_write_data(gpmc_vram_write_data),
-        .vram_write(gpmc_vram_write),
-        .vram_can_write(gpmc_vram_can_write)
-    );
-
-    // gpmc_vram_queue is an async FIFO used to bring video RAM writes from
-    // the gpmc clock domain into the SDRAM domain so that the SDRAM controller
-    // can process them next time the SDRAM bus is available.
-    asyncfifo #(.BUFFER_ADDR_WIDTH(4), .DATA_WIDTH(32)) gpmc_vram_queue (
-        .reset(reset),
-        .write_clk(gpmc_clk),
-        .write(gpmc_vram_write),
-        .write_data({gpmc_vram_write_addr, gpmc_vram_write_data}),
-        .can_write(gpmc_vram_can_write),
-
-        .read_clk(vram_clk),
-        // TODO: hook up the rest, once we have something consuming the output.
+        .can_write(data_can_write),
+        .write_data(pixel_data),
+        .write_ready(pixel_data_ready)
     );
 
     main main(
         .pixel_clk(pixel_clk),
         .reset(reset),
+
+        .data_clk(vram_clk),
+        .data_can_write(data_can_write),
+        .data_in(pixel_data),
+        .data_write(pixel_data_ready),
 
         .disp_clk(disp_clk),
         .disp_hsync(disp_hsync),
@@ -124,16 +101,6 @@ module top(
         .disp_b(disp_b),
         .disp_g(disp_g),
         .disp_r(disp_r),
-
-        .host_vram_cs(host_vram_cs),
-        .host_vram_addr(host_addr),
-        .host_vram_data(host_data),
-        .host_vram_done(host_done),
-        .host_reg_cs(host_reg_cs),
-        .host_reg_addr(host_addr),
-        .host_reg_data(host_data),
-        .host_reg_done(host_done),
-        .host_write_avail(host_write_avail)
     );
 
 endmodule

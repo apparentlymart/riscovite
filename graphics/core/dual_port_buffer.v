@@ -18,10 +18,7 @@ module dual_port_buffer(
     reg [DATA_WIDTH-1:0] buffer[BUFFER_SIZE-1:0];
 
     always @(negedge read_clk) begin
-        if (reset)
-            read_data <= 0;
-        else
-            read_data <= buffer[read_addr];
+        read_data <= buffer[read_addr];
     end
 
     always @(negedge write_clk) begin
