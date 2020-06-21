@@ -6,19 +6,12 @@ module asyncfifo(
   output reg                  can_write,
   input                       read_clk,
   input                       read,
-  output reg [DATA_WIDTH-1:0] read_data,
+  output     [DATA_WIDTH-1:0] read_data,
   output reg                  can_read
 );
     parameter DATA_WIDTH = 16;
     parameter BUFFER_ADDR_WIDTH = 8;
     parameter BUFFER_SIZE = 2 ** BUFFER_ADDR_WIDTH;
-
-    // Our buffer as a whole is accessed by both the write_clk and read_clk
-    // domains, but read_clk is only used to access elements >= read_ptr and
-    // write_clk only for elements < read_ptr. We're expecting this buffer to
-    // be inferred as a dual-port block RAM, so the board-specific top module
-    // should choose a suitable buffer size to allow that inference.
-    reg [DATA_WIDTH-1:0] buffer[BUFFER_SIZE-1:0];
 
     ///// WRITE CLOCK DOMAIN /////
 
@@ -61,14 +54,6 @@ module asyncfifo(
         end
     end
 
-    // If "write" is set on a clock then we commit write_data into the current
-    // write address.
-    always @(posedge write_clk) begin
-        if (write && can_write) begin
-            buffer[write_addr] <= write_data;
-        end
-    end
-
     ///// READ CLOCK DOMAIN /////
 
     // This is an address into the buffer array.
@@ -98,7 +83,6 @@ module asyncfifo(
         if (reset) begin
             read_ptr <= 0;
             read_ptr_grey_r <= 0;
-            read_data <= 0;
             can_read <= 0;
         end else begin
             if (read) begin
@@ -108,22 +92,32 @@ module asyncfifo(
                 end
                 can_read <= next_can_read;
                 if (next_can_read) begin
-                    read_data <= buffer[next_read_ptr];
-                end else begin
-                    read_data <= 0;
+                    read_ptr <= next_read_ptr;
                 end
             end else begin
-                can_read = current_can_read;
-                if (current_can_read) begin
-                    read_data <= buffer[read_addr];
-                end else begin
-                    read_data <= 0;
-                end
+                can_read <= current_can_read;
             end
         end
     end
 
     ///// CROSS-DOMAIN /////
+
+    // The backing store for our queue is a dual-port buffer, which is
+    // written in the write clock domain and read in the read clock domain.
+    // This is okay because our rules above ensure that each element of the
+    // buffer is either unused pending write or used pending read.
+    dual_port_buffer #(.DATA_WIDTH(DATA_WIDTH), .BUFFER_ADDR_WIDTH(BUFFER_ADDR_WIDTH)) buffer(
+        .reset(reset),
+
+        .write_clk(write_clk),
+        .write_addr(write_addr),
+        .write_data(write_data),
+        .write_enable(write && can_write),
+
+        .read_clk(read_clk),
+        .read_addr(read_addr),
+        .read_data(read_data)
+    );
 
     // Synchronize read_ptr_grey_r into read_ptr_grey_w.
     crossdomain #(.SIZE(BUFFER_ADDR_WIDTH+1)) read_ptr_grey_sync (

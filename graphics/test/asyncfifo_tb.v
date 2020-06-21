@@ -1,4 +1,5 @@
 `include "crossdomain.v"
+`include "dual_port_buffer.v"
 `include "asyncfifo.v"
 
 module asyncfifo_tb();
